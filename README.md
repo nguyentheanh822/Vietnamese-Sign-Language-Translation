@@ -9,7 +9,7 @@
 | Attribute | Value |
 |---|---|
 | Total videos | 8, 400 |
-| Total sentences | 150 |
+| Total sentences | 300 |
 | Total signers | 6 |
 | Unique glosses | 231 |
 | Total gloss tokens | 8,113 |
