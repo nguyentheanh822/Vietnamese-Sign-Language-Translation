@@ -1,0 +1,20 @@
+/home/anhnt/.local/lib/python3.8/site-packages/torch/nn/modules/transformer.py:282: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+Device: cuda
+Trans vocab loaded from file: 442 tokens
+Gloss vocab size : 235
+Trans vocab size : 442
+[VSLDataset] split=val: 240 samples loaded
+/usr/lib/python3/dist-packages/requests/__init__.py:89: RequestsDependencyWarning: urllib3 (2.2.3) or chardet (3.0.4) doesn't match a supported version!
+  warnings.warn("urllib3 ({}) or chardet ({}) doesn't match a supported "
+Traceback (most recent call last):
+  File "source/evaluate.py", line 229, in <module>
+    main()
+  File "source/evaluate.py", line 129, in main
+    missing, unexpected = model.load_state_dict(model_state, strict=False)
+  File "/home/anhnt/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 2152, in load_state_dict
+    raise RuntimeError('Error(s) in loading state_dict for {}:\n\t{}'.format(
+RuntimeError: Error(s) in loading state_dict for SOTAModel:
+	size mismatch for tgt_embedding.weight: copying a param with shape torch.Size([302, 512]) from checkpoint, the shape in current model is torch.Size([442, 512]).
+	size mismatch for trans_head.weight: copying a param with shape torch.Size([302, 512]) from checkpoint, the shape in current model is torch.Size([442, 512]).
+	size mismatch for trans_head.bias: copying a param with shape torch.Size([302]) from checkpoint, the shape in current model is torch.Size([442]).

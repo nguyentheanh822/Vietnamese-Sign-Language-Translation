@@ -1,0 +1,55 @@
+# config_C_dropout.yaml — Run C: High Regularization
+# dropout=0.2, weight_decay=5e-3
+# Muc tieu: Regularize manh hon -> giam signer gap, cai thien test BLEU-4
+
+# ── Dataset ──────────────────────────────────────────────────────────────────
+data:
+  base_dir: "/workspace/yhnn/VSL_GH"
+  keypoints_dir: "data/keypoints"
+  annotations_dir: "data/annotations"
+  splits_dir: "data/splits"
+  gloss_vocab: "data/gloss_vocab.txt"
+  dataset_json: "data/dataset.json"
+  input_dim: 822
+  max_seq_len: 300
+  max_gloss_len: 20
+  max_trans_len: 30
+
+# ── Model ────────────────────────────────────────────────────────────────────
+model:
+  d_model: 512
+  nhead: 8
+  num_encoder_layers: 6
+  num_decoder_layers: 6
+  dim_feedforward: 2048
+  dropout: 0.2          # Tang tu 0.1 -> 0.2
+  activation: "relu"
+
+# ── Training ─────────────────────────────────────────────────────────────────
+training:
+  epochs: 150
+  batch_size: 16
+  learning_rate: 5.0e-5
+  lr_warmup_steps: 1000
+  weight_decay: 5.0e-3  # Tang manh tu 1e-3 -> 5e-3
+  clip_grad_norm: 1.0
+  ctc_weight: 0.3
+  ce_weight: 0.7
+  gpus: [1]
+  num_workers: 2
+  save_dir: "results/run_C_dropout"
+  save_every: 5
+  patience: 30
+
+# ── Evaluation ───────────────────────────────────────────────────────────────
+evaluation:
+  beam_size: 4
+  max_decode_len: 30
+
+# ── Augmentation ─────────────────────────────────────────────────────────────
+augmentation:
+  flip_prob: 0.5
+  speed_factor: [0.6, 1.4]
+  noise_std: 0.02
+  rotation_deg: 20
+  scale_factor: [0.85, 1.15]

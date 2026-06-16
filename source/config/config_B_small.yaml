@@ -1,0 +1,55 @@
+# config_B_small.yaml — Run B: Small Model
+# d_model=256, 4 encoder/decoder layers, ffn=1024
+# Muc tieu: Giam signer gap (val-test) bang mo hinh nho hon, it overfit hon
+
+# ── Dataset ──────────────────────────────────────────────────────────────────
+data:
+  base_dir: "/workspace/yhnn/VSL_GH"
+  keypoints_dir: "data/keypoints"
+  annotations_dir: "data/annotations"
+  splits_dir: "data/splits"
+  gloss_vocab: "data/gloss_vocab.txt"
+  dataset_json: "data/dataset.json"
+  input_dim: 822
+  max_seq_len: 300
+  max_gloss_len: 20
+  max_trans_len: 30
+
+# ── Model ────────────────────────────────────────────────────────────────────
+model:
+  d_model: 256          # Giam tu 512 -> 256
+  nhead: 4              # Giam tu 8 -> 4 (phai chia het d_model)
+  num_encoder_layers: 4 # Giam tu 6 -> 4
+  num_decoder_layers: 4 # Giam tu 6 -> 4
+  dim_feedforward: 1024 # Giam tu 2048 -> 1024
+  dropout: 0.1
+  activation: "relu"
+
+# ── Training ─────────────────────────────────────────────────────────────────
+training:
+  epochs: 150
+  batch_size: 16
+  learning_rate: 5.0e-5
+  lr_warmup_steps: 1000
+  weight_decay: 1.0e-3
+  clip_grad_norm: 1.0
+  ctc_weight: 0.3
+  ce_weight: 0.7
+  gpus: [0]
+  num_workers: 2
+  save_dir: "results/run_B_small"
+  save_every: 5
+  patience: 30
+
+# ── Evaluation ───────────────────────────────────────────────────────────────
+evaluation:
+  beam_size: 4
+  max_decode_len: 30
+
+# ── Augmentation ─────────────────────────────────────────────────────────────
+augmentation:
+  flip_prob: 0.5
+  speed_factor: [0.6, 1.4]
+  noise_std: 0.02
+  rotation_deg: 20
+  scale_factor: [0.85, 1.15]

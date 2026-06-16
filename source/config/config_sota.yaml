@@ -1,0 +1,62 @@
+# config/config_sota.yaml
+# Cau hinh hyperparameters cho SOTA Model (ST-GCN + Transformer)
+
+# ── Dataset ──────────────────────────────────────────────────────────────────
+data:
+  base_dir: "/workspace/yhnn/VSL_GH"
+  keypoints_dir: "data/keypoints"
+  annotations_dir: "data/annotations"
+  splits_dir: "data/splits"
+  gloss_vocab: "data/gloss_vocab.txt"
+  dataset_json: "data/dataset.json"
+
+  input_dim: 822
+  max_seq_len: 300
+  max_gloss_len: 20
+  max_trans_len: 30
+
+# ── Model ────────────────────────────────────────────────────────────────────
+model:
+  use_sota: True            # Kich hoat kien truc ST-GCN
+  num_nodes: 137            # 25 pose + 70 face + 42 hands = 137 nodes
+  coords: 6                 # x, y, z, vx, vy, vz
+  d_model: 512
+  nhead: 8
+  num_encoder_layers: 4     # Giam so lop encoder vi da co ST-GCN front-end
+  num_decoder_layers: 6
+  dim_feedforward: 2048
+  dropout: 0.1
+  activation: "relu"
+
+# ── Training ─────────────────────────────────────────────────────────────────
+training:
+  epochs: 150
+  batch_size: 4
+  accumulation_steps: 4
+  learning_rate: 5.0e-5
+  lr_warmup_steps: 1000
+  weight_decay: 1.0e-3
+  clip_grad_norm: 1.0
+
+  ctc_weight: 0.3
+  ce_weight: 0.7
+
+  gpus: [1]                 # Chay tren GPU 1 de tranh chiem dung may, de GPU 0 ranh
+  num_workers: 4
+
+  save_dir: "results/run_SOTA_stgcn"
+  save_every: 10
+  patience: 30
+
+# ── Evaluation ───────────────────────────────────────────────────────────────
+evaluation:
+  beam_size: 1              # Greedy van dang la tot nhat tren data nay
+  max_decode_len: 30
+
+# ── Augmentation ─────────────────────────────────────────────────────────────
+augmentation:
+  flip_prob: 0.5
+  speed_factor: [0.6, 1.4]
+  noise_std: 0.02
+  rotation_deg: 20
+  scale_factor: [0.85, 1.15]

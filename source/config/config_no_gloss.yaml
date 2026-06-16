@@ -1,0 +1,65 @@
+# config/config.yaml
+# Cau hinh hyperparameters cho VSL-GH SLT model
+# v2: skeleton-relative normalization + velocity features (411->822)
+
+# ── Dataset ──────────────────────────────────────────────────────────────────
+data:
+  base_dir: "/workspace/yhnn/VSL_GH"
+  keypoints_dir: "data/keypoints"
+  annotations_dir: "data/annotations"
+  splits_dir: "data/splits"
+  gloss_vocab: "data/gloss_vocab.txt"
+  dataset_json: "data/dataset.json"
+
+  # Keypoint dimensions: (Pose25 + Face70 + Hand21x2) * 3 coords = 411
+  # v2: position (411) + velocity (411) = 822
+  input_dim: 822
+  max_seq_len: 300          # Max frames per video (30fps x 10s)
+  max_gloss_len: 20         # Max glosses per sentence
+  max_trans_len: 30         # Max tokens in Vietnamese translation
+
+# ── Model ────────────────────────────────────────────────────────────────────
+model:
+  d_model: 512
+  nhead: 8
+  num_encoder_layers: 6
+  num_decoder_layers: 6
+  dim_feedforward: 2048
+  dropout: 0.1
+  activation: "relu"
+
+# ── Training ─────────────────────────────────────────────────────────────────
+training:
+  epochs: 150               # Tang tu 100 -> 150 (model van dang hoc)
+  batch_size: 4             # Per GPU
+  accumulation_steps: 4
+  learning_rate: 5.0e-5     # Giam tu 1e-4 -> 5e-5 (on dinh hon voi skeleton norm)
+  lr_warmup_steps: 1000     # Tang warmup tu 500 -> 1000
+  weight_decay: 1.0e-3      # Tang regularization tu 1e-4 -> 1e-3
+  clip_grad_norm: 1.0
+
+  # Loss weights
+  ctc_weight: 0.0           # Giam ctc tu 0.5->0.3, tang ce tu 0.5->0.7
+  ce_weight: 1.0            # Translation loss quan trong hon
+
+  # GPU settings (chi dung GPU 0 va 1)
+  gpus: [0, 1]
+  num_workers: 4            # DataLoader workers
+
+  # Checkpointing
+  save_dir: "results/run_no_gloss"
+  save_every: 5             # Save checkpoint moi N epochs
+  patience: 30              # Tang patience tu 20 -> 30 (de train dai hon)
+
+# ── Evaluation ───────────────────────────────────────────────────────────────
+evaluation:
+  beam_size: 4              # Beam search
+  max_decode_len: 30
+
+# ── Augmentation ─────────────────────────────────────────────────────────────
+augmentation:
+  flip_prob: 0.5            # Horizontal flip (trao doi tay trai/phai)
+  speed_factor: [0.6, 1.4]  # Temporal jitter (rong hon: 0.8-1.2 -> 0.6-1.4)
+  noise_std: 0.02           # Gaussian noise (tang tu 0.01 -> 0.02)
+  rotation_deg: 20          # Random rotation (tang tu 15 -> 20)
+  scale_factor: [0.85, 1.15] # Random body scale (THEM MOI - simulate kich thuoc signer)
