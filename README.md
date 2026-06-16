@@ -25,9 +25,9 @@
 
 | Split | Signers | Videos |
 |---|---|---|
-| Train | S01, S02, S03, S04 (×3 reps each) | 1,800 |
-| Val | S05 (×1 rep) | 150 |
-| Test | S06 (×1 rep) | 150 |
+| Train | S01, S02, S03, S04 (×3 reps each) | 3, 600 |
+| Val | S05 (×1 rep) | 300 |
+| Test | S06 (×1 rep) | 300 |
 
 The val and test signers are **unseen during training**, enabling evaluation of **signer-independent generalization**.
 
