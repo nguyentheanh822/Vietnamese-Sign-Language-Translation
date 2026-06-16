@@ -8,7 +8,7 @@
 
 | Attribute | Value |
 |---|---|
-| Total videos | 2,100 |
+| Total videos | 8, 400 |
 | Total sentences | 150 |
 | Total signers | 6 |
 | Unique glosses | 231 |
