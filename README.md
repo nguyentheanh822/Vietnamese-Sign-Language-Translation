@@ -16,26 +16,26 @@ VSL-GH is a large-scale, high-quality dataset for Vietnamese Sign Language (VSL)
 
 | Attribute | Value |
 |---|---|
-| Total videos | 8, 400 |
+| Total videos | 8,400 (4,200 Frontal + 4,200 Lateral) |
 | Total sentences | 300 |
 | Total signers | 6 |
-| Unique glosses | 231 |
-| Total gloss tokens | 8,113 |
-| Avg. glosses/sentence | 3.86 |
-| Avg. words/translation | 5.77 |
-| Avg. video duration | 3.10 s |
+| Unique glosses | 466 |
+| Total gloss tokens | 1,174 |
+| Avg. glosses/sentence | 3.91 |
+| Avg. words/translation | 6.2 |
+| Avg. video duration | 3.6 s |
 | Video resolution | 1080 × 1080 (1:1) |
 | Frame rate | 30 fps |
 | Background | Green screen (controlled) |
-| View | Front |
+| View | Frontal + Lateral (Side) |
 
 ### Splits
 
-| Split | Signers | Videos |
-|---|---|---|
-| Train | S01, S02, S03, S04 (×3 reps each) | 3, 600 |
-| Val | S05 (×1 rep) | 300 |
-| Test | S06 (×1 rep) | 300 |
+| Split | Signers | Videos (per view) | Total Videos |
+|---|---|---|---|
+| Train | S01, S02, S03, S04 (×3 reps each) | 3,600 | 7,200 |
+| Val | S05 (×1 rep) | 300 | 600 |
+| Test | S06 (×1 rep) | 300 | 600 |
 
 The val and test signers are **unseen during training**, enabling evaluation of **signer-independent generalization**.
 
@@ -75,16 +75,16 @@ Translation 00:00:00.000    00:00:03.000    Tôi có phải chờ lâu không?
 ```
 VSL-GH/
 ├── data/
-│   ├── videos/            # 2,100 × .mp4
-│   ├── annotations/       # 2,100 × .txt (gloss + translation)
-│   ├── keypoints/         # MediaPipe Holistic keypoints (.npy)
+│   ├── videos/            # 8,400 × .mp4 (4,200 Frontal + 4,200 Lateral)
+│   ├── annotations/       # 4,200 × .txt (gloss + translation)
+│   ├── keypoints/         # 8,400 × .npy (MediaPipe Holistic)
 │   ├── splits/
-│   │   ├── train.txt      # 1,800 video IDs
-│   │   ├── val.txt        # 150 video IDs
-│   │   └── test.txt       # 150 video IDs
+│   │   ├── train.txt      # 3,600 video IDs
+│   │   ├── val.txt        # 300 video IDs
+│   │   └── test.txt       # 300 video IDs
 │   ├── dataset.json       # Full metadata per video
 │   ├── dataset_stats.json # Dataset-level statistics
-│   └── gloss_vocab.txt    # 231 unique glosses + special tokens
+│   └── gloss_vocab.txt    # 466 unique glosses + special tokens
 ├── results/               # Experiment results
 └── source/                # Source code
 ```
