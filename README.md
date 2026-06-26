@@ -20,7 +20,8 @@ VSL-GH is a large-scale, high-quality dataset for Vietnamese Sign Language (VSL)
 | Total sentences | 300 |
 | Total signers | 6 |
 | Unique glosses | 466 |
-| Total gloss tokens | 1,174 |
+| Total gloss tokens (in 300 sentences) | 1,174 |
+| Total gloss tokens (across 8,400 videos) | ~32,800 |
 | Avg. glosses/sentence | 3.91 |
 | Avg. words/translation | 6.2 |
 | Avg. video duration | 3.6 s |
