@@ -19,3 +19,4 @@ data/videos/
 data/raw/
 data/ELAN/
 data/*.xlsx
+PAPER_*.md\nFINAL_RESULTS.md\npaper_vslgh.md\nimplementation_plan.md\nwalkthrough.md\nfix_device*.py\ngenerate_tex*.py\ntest_*.py\nbackup_smart.sh\ninstall_log.txt
