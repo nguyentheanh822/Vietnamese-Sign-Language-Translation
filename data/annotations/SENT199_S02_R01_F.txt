@@ -1,0 +1,4 @@
+Gloss		00:00:00.010	00:00:00.880	CÓ-PHẢI
+Gloss		00:00:00.880	00:00:01.560	THAI
+Gloss		00:00:01.560	00:00:02.080	CÓ-KHÔNG
+Translation		00:00:00.000	00:00:02.080	Có phải tôi mang thai không?

@@ -1,0 +1,5 @@
+Gloss		00:00:00.010	00:00:01.090	HỎI
+Gloss		00:00:01.090	00:00:01.560	LỐI-SỐNG
+Gloss		00:00:01.560	00:00:02.230	THAY-ĐỔI
+Gloss		00:00:02.230	00:00:02.870	ĐÚNG-KHÔNG
+Translation		00:00:00.000	00:00:02.870	Tôi chỉ cần thay đổi lối sống thôi đúng không?

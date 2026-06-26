@@ -1,0 +1,7 @@
+Gloss		00:00:00.010	00:00:00.850	KHI
+Gloss		00:00:00.850	00:00:01.350	SAU
+Gloss		00:00:01.350	00:00:01.930	ĂN
+Gloss		00:00:01.930	00:00:02.310	TÔI
+Gloss		00:00:02.310	00:00:02.770	THUỐC-UỐNG
+Gloss		00:00:02.770	00:00:03.776	PHẢI-KHÔNG
+Translation		00:00:00.000	00:00:03.780	Tôi uống thuốc này sau khi ăn phải không?

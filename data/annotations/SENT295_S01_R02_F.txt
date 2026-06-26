@@ -1,0 +1,5 @@
+Gloss		00:00:00.010	00:00:00.700	HỎI
+Gloss		00:00:00.700	00:00:01.540	THUỐC-UỐNG
+Gloss		00:00:01.540	00:00:02.070	KHÔNG-CẦN
+Gloss		00:00:02.070	00:00:03.110	PHẢI-KHÔNG
+Translation		00:00:00.000	00:00:03.110	Vậy là tôi không cần uống thuốc phải không?

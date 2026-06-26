@@ -1,0 +1,4 @@
+Gloss		00:00:00.010	00:00:00.930	TÔI
+Gloss		00:00:00.930	00:00:01.470	MIỆNG-HÁ
+Gloss		00:00:01.470	00:00:02.230	PHẢI-KHÔNG
+Translation		00:00:00.000	00:00:02.230	Tôi há miệng ra phải không?

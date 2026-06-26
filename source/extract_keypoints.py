@@ -197,7 +197,10 @@ def main():
     args = parser.parse_args()
 
     # Load danh sach video
-    video_files = sorted(VIDEO_DIR.glob("*.mp4"))
+    video_files = []
+    for ext in ["*.mp4", "*.MP4", "*.avi", "*.AVI"]:
+        video_files.extend(VIDEO_DIR.rglob(ext))
+    video_files = sorted(list(set(video_files)))
     print(f"Tong so videos: {len(video_files)}")
     print(f"Workers: {args.num_workers}")
     print(f"Resume mode: {args.resume}")

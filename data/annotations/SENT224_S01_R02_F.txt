@@ -1,0 +1,5 @@
+Gloss		00:00:00.010	00:00:01.030	TÔI
+Gloss		00:00:01.030	00:00:01.770	HỌNG
+Gloss		00:00:01.770	00:00:02.600	AMIDAN
+Gloss		00:00:02.600	00:00:03.450	CÓ-KHÔNG
+Translation		00:00:00.000	00:00:03.450	Tôi có bị viêm amidan không?

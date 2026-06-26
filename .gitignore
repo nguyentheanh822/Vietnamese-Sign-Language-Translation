@@ -1,8 +1,21 @@
 venv/
 temp/
 results/
-data/
-*.log
 __pycache__/
 .DS_Store
 .env
+*.log
+*.pdf
+*.tex
+*.out
+*.aux
+*.log
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Ignore raw videos but keep keypoints and annotations
+data/videos/
+data/raw/
+data/ELAN/
+data/*.xlsx

@@ -1,0 +1,784 @@
+=== Page 1 ===
+VSL-GH: A Sentence-Level Vietnamese Sign Language Dataset
+for General Health Examination
+Author One1Author Two1Author Three2Author Four1
+1The Saigon International University (SIU)2Centre for Education of the Deaf (CED)
+{author1, author2}@siu.edu.vn
+Abstract
+Progress in Vietnamese Sign Language (VSL) translation has been
+limited by the scarcity of sentence-level annotated datasets, particu-
+larly those capturing regional variations. To address this gap, we in-
+troduce VSL-GH , the first sentence-level VSL dataset dedicated to the
+Ho Chi Minh City variant, designed for general healthcare communi-
+cation. The dataset comprises 8,400 videos from 6 deaf signers, cov-
+ering 300 healthcare-related sentences, each annotated with temporal
+glossboundaries,Vietnamesesentences,andbodykeypoints. Toevalu-
+atethedataset,weconductexperimentsinasigner-independentsetting,
+achieving a BLEU-4 score of 66.82%. These results demonstrate its
+potentialforsupportingpracticalVSLtranslationsystems. Thedataset
+is publicly available on GitHub.
+1.Introduction
+Sign language is the primary mode of communication for deaf
+communities worldwide, with its own grammar and structure
+distinct from spoken languages. In Vietnam, approximately
+1.2 million people are deaf or hard of hearing, the majority of
+whom use Vietnamese Sign Language (VSL) as their first lan-
+guage. However, communication barriers between the deaf
+community and hearing individuals remain substantial, par-
+ticularly in healthcare settings. Recent reports indicate that
+only 7 in 100 deaf individuals have full access to healthcare
+services, largely due to the critical shortage of sign language
+interpreters at medical facilities. This shortage can lead to
+miscommunication during medical consultations, potentially
+compromising the quality of patient care.
+In this context, the rapid development of computer vision
+and deep learning has opened up promising approaches to
+bridging this communication gap. Sign Language Translation
+(SLT) systems leverage deep learning models to automatically
+convert sequences of gestures from video into text or speech,
+thereby enabling real-time communication without relying en-
+tirely on human interpreters. By processing video data and
+extracting information from hand movements, facial expres-
+sions, and body posture, these methods have progressively im-
+proved the effectiveness of understanding and translating sign
+language. This progress offers significant potential for real-
+world applications, particularly in healthcare settings, where
+timely and accurate communication is critical to ensuring the
+quality of patient care.
+However, training SLT models requires continuous sign lan-
+guage datasets in which data is annotated at the sentence level.
+In Vietnam, datasets meeting this requirement do not yet exist;
+the majority of available resources are limited to isolated sign
+recognition. A further challenge is that existing datasets do
+not distinguish between regional variants, despite the fact that
+VSL encompasses three major forms — Hanoi, Hai Phong,and Ho Chi Minh City — which differ substantially in vocab-
+ulary and expression.
+To address the limitations above, we introduce VSL-GH ,
+the first continuous sentence-level multiview VSL dataset for
+general healthcare communication, based on the Ho Chi Minh
+City variant. The dataset was developed in collaboration with
+CED and physicians at Tan Hung General Hospital to ensure
+both sign language accuracy and medical validity. VSL-GH
+comprises 8,400 multiview videos from 6 deaf signers, cover-
+ing 300 sentences annotated with temporal gloss boundaries,
+Vietnamese text translations, and body keypoints. This dataset
+provides a foundation for supporting the development of prac-
+tical SLT systems in Vietnamese healthcare settings.
+The main contributions of this work are as follows: (a)We
+introduce VSL-GH , a continuous sentence-level multiview
+Vietnamese Sign Language dataset for general healthcare com-
+munication, based on the Ho Chi Minh City variant, com-
+prising 8,400 videos across 300 healthcare-related sentences;
+(b) VSL-GH provides rich multi-level annotations includ-
+ing temporal gloss boundaries, Vietnamese text translations,
+and body keypoints, collected in collaboration with CED and
+physicians at Tan Hung General Hospital to ensure linguistic
+and medical validity; (c)We establish a signer-independent
+evaluation protocol and conduct baseline SLT experiments,
+achieving a BLEU-4 score of 66.82%, demonstrating the
+dataset’s usability and potential for practical VSL translation
+systems in healthcare settings.
+2.Background and Related Work
+This section presents the fundamental challenges of sign lan-
+guage translation, an overview of currently available public
+sign language datasets, and the motivation for VSL-GH.
+2.1Sign Language
+Sign language is a visual language that conveys meaning
+through body movements and facial expressions, with its own
+grammar and structure entirely independent of spoken lan-
+guage. It comprises two core components: (i) manual fea-
+tures, including handshape, palm orientation, movement, and
+location of the hands in signing space; and (ii) non-manual
+markers (NMF), including head movements, mouth patterns,
+facial expressions, eye gaze, and other non-manual cues. Ac-
+curately interpreting a signed utterance requires the simulta-
+neous integration of both components, as non-manual mark-
+ers often carry critical grammatical functions—such as distin-
+guishing yes/no questions from declarative sentences, mark-
+ing negation, or expressing emphasis—that cannot be inferred
+from manual features alone.
+Vietnamese Sign Language (VSL) exists in three major re-
+1
+
+=== Page 2 ===
+Table 1: Comparison of publicly available continuous sign language translation datasets.
+Dataset Lang. Sentences Videos Signers Multiview Translation Gloss Keypoints Domain
+RWTH-Phoenix-2014T [1] DGS 8,257 8,257 9 × ✓ ✓ × Weather
+How2Sign [3] ASL 35,191 35,191 11 ✓ ✓ ✓ ✓ Multi-domain
+Pasco1 [5] LSF-CH 2,031 2,031 – × ✓ ✓ × Healthcare
+JUMILA-QSL-22 [7] QSL 900 25,200 7 ✓ ✓ ✓ × Healthcare
+CE-CSL [8] CSL 5,988 5,988 12 × ✓ ✓ × Daily life
+KETI [9] KSL 105 14,672 14 × ✓ ✓ ✓ Emergency
+VSL-GH (ours) VSL 300 8,400 6 ✓ ✓ ✓ ✓ Healthcare
+gional variants—Hanoi, Hai Phong, and Ho Chi Minh City—
+which differ substantially in vocabulary and signing conven-
+tions. These variants are mutually distinct to the extent that
+a system developed for one variant cannot be directly applied
+to another, making it essential for any VSL dataset to clearly
+specify the regional form it represents, creating additional
+challenges for automatic translation that requires explicit mod-
+eling of this structural divergence.
+Processing continuous sign language presents additional
+challenges beyond isolated sign recognition. In isolated sign
+recognition, each sign is treated as an independent unit and
+classified independently. In contrast, continuous sign lan-
+guage is not a simple concatenation of individual signs—signs
+influence one another through co-articulation , causing the
+same sign to appear differently depending on its surrounding
+context. Additionally, the alignment between sign sequences
+and their corresponding text translations is non-monotonic
+and not known in advance, making the translation task sig-
+nificantly more complex than a straightforward sequence-to-
+sequence mapping. Consequently, translation systems must
+be capable of modeling both spatial and temporal information
+across variable-length sequences to accurately capture the con-
+text and meaning of continuous sign language utterances.
+Such data is suitable for specific applications such as dictio-
+nary construction or sign language learning support, but does
+not meet the requirements of SLT, which demands continu-
+ous sentence-level data annotated with temporal boundaries,
+parallel text translations, and body
+2.2Sign Language Datasets
+International sign language datasets. At the international
+level, a number of continuous sign language datasets have
+been collected and made publicly available, as summarised
+in Table 1. RWTH-Phoenix-2014T [2] is the most widely
+adopted benchmark for SLT research, featuring 8,257 videos
+from 9 signers of German Sign Language (DGS) with full
+gloss and translation annotations. However, it covers only
+the narrow domain of weather forecasting and provides nei-
+ther body keypoints nor multiview recordings. How2Sign [4]
+is the largest ASL dataset to date, comprising 35,191 videos
+from 11 signers with multiview recording, multi-modal anno-
+tations, and broad topical coverage, making it the most com-
+prehensive SLT resource currently available. In the health-
+care domain, PaSCo [6] provides 2,031 French-Swiss Sign
+Language videos with medical annotations, while JUMILA-
+QSL-22 [7] contains 25,200 videos of Qatari Sign Languageacross 900 healthcare-related sentences with multiview sup-
+port. KETI [9] addresses emergency communication scenar-
+ios with 14,672 videos from 14 signers of Korean Sign Lan-
+guage. CE-CSL [8] provides 5,988 Chinese Sign Language
+videos for daily-life translation tasks.
+Despite their contributions, these international datasets are
+collectively constrained by one or more of the following lim-
+itations: (i) narrow domain coverage that restricts generalisa-
+tion to other communication contexts; (ii) absence of multi-
+view recording, which limits the capture of spatial informa-
+tion and increases hand occlusion; or (iii) absence of body
+keypoint annotations, which are increasingly important for
+privacy-preserving and computationally efficient SLT systems.
+More fundamentally, all of these datasets target sign languages
+with grammatical and lexical characteristics that differ sub-
+stantially from VSL, and none can be directly applied to Viet-
+namese sign language translation.
+Table 2: Existing Vietnamese Sign Language datasets.
+Dataset Year Videos Signs Level
+VSL Alphabet 2025 875 25 Letter
+ViSL One-shot 2024 436,400 4,364 Word
+Multi-VSL 2025 84,764 1,000 Word
+Vietnamese Sign Language datasets. In Vietnam, recent
+efforts to build sign language datasets have yielded several
+noteworthy contributions, as summarised in Table 2. VSL Al-
+phabet contains 875 videos covering 25 letter signs, serving
+as a resource for fingerspelling recognition. ViSL One-shot
+provides 436,400 videos for 4,364 word-level signs, targeting
+one-shot learning scenarios. Multi-VSL offers 84,764 multi-
+view videos for 1,000 word-level signs with gloss annotations,
+representing the most comprehensive VSL resource to date.
+However, all existing VSL datasets operate at the isolated let-
+ter or word level and do not provide sentence-level data. While
+such data is suitable for specific applications such as dictio-
+nary construction or sign language learning support, it does
+not meet the requirements of SLT, which demands continu-
+ous sentence-level data annotated with temporal boundaries,
+parallel text translations, and body keypoints. Furthermore,
+none of the existing datasets clearly distinguishes between the
+three major VSL regional variants, limiting their applicability
+to systems that need to handle variant-specific vocabulary and
+grammar.
+2
+
+=== Page 3 ===
+Figure 1: The VSL-GH dataset consists of 8,400 multiview sign language videos and aligned modalities. Left: Green screen
+studio RGB videos (frontal and lateral views) showing five glosses of a sample sentence performed by two signers, with gloss
+annotation and corresponding Vietnamese sentence shown below the frames. Right : Body-face-hands keypoints automatically
+extracted using MediaPipe Holistic (25 body +70 face +42 hand landmarks per frame).
+Summary. While the international research community has
+made significant progress in building continuous sign lan-
+guage datasets for SLT, this gap remains entirely unaddressed
+for VSL — particularly in the healthcare domain, where no
+specialised dataset currently exists and where the regional vari-
+ation among VSL variants has not been systematically consid-
+ered. VSL-GH is introduced to fill this gap, providing the first
+sentence-level VSL dataset dedicated to the Ho Chi Minh City
+variant, with comprehensive multi-level annotations and mul-
+tiview recordings designed to support the full SLT pipeline in
+a healthcare communication context.
+3.The VSL-GH Dataset
+This section describes the comprehensive construction
+pipeline of VSL-GH, the first sentence-level Vietnamese Sign
+Language dataset designed for healthcare communication in
+the Ho Chi Minh City variant of Vietnamese Sign Language.
+The construction pipeline consists of five stages: domain-
+specific sentence list design and gloss convention standardisa-
+tion, multiview sign language video data collection from deaf
+signers, body landmark representation extraction, multi-level
+annotation and quality control, and dataset statistics. Through
+this pipeline, VSL-GH provides a multimodal resource com-
+bining sentence-level sign language videos, temporally aligned
+gloss annotations, corresponding Vietnamese sentences, and
+skeletal representations to support diverse research directions
+in sign language translation.
+3.1Sentence and Gloss List Preparation
+Sentence list. The sentence list of VSL-GH was constructed
+in the general health examination domain based on two main
+rationales. First, this is the most frequently accessed medi-
+cal procedure, and therefore represents a higher priority than
+more specialised medical topics. Second, no Vietnamese sign
+language dataset has been developed for the healthcare do-Table 3: Sentence distribution in VSL-GH .
+Category No. sentences
+Distribution by examination stage
+Part 1: Registration 68
+Part 2: Physical examination 32
+Part 3: Clinical examination 130
+Part 4: Paraclinical examination 40
+Part 5: Conclusion 30
+Distribution by sentence type
+Declarative sentences 162
+Interrogative sentences 102
+Exclamatory sentences 36
+Distribution by sign feature
+Manual feature sentences (MF) 185
+Non-manual feature sentences (NMF) 115
+Total sentences 300
+main, and this gap in Vietnam remains entirely unfilled. In
+terms of scale, the dataset was designed with 300 sentences
+— a size determined by reference to domain-specific SLT
+datasets such as KETI with 105 sentences that remain suit-
+able for SLT models, while ensuring four criteria: full cover-
+age of all examination stages, sufficient vocabulary diversity,
+maintainable manual annotation quality, and feasible data col-
+lection cost.
+Sentence list content. The sentence list was constructed fol-
+lowing Circular 32/2023/TT-BYT of the Vietnamese Min-
+istry of Health, reflecting the actual general health exami-
+nation procedure divided into five parts: (1) Registration,
+(2) Physical examination, (3) Clinical examination, (4) Par-
+3
+
+=== Page 4 ===
+Table 4: Examples of Vietnamese sentence–gloss sequence
+pairs in VSL-GH .
+Vietnamese sentence Gloss sequence
+Tôi muốn đăng ký khám sức khỏe. TÔI/ ĐĂNG-KÝ/ KHÁM/
+SỨC-KHOẺ/ MUỐN
+Tôi chưa hẹn trước. TÔI/ HẸN/ TRƯỚC/ CHƯA
+(Mặt lắc đầu)
+Bác sĩ có thể viết ra giấy được
+không?CHỈ/ BÁC-SĨ/ VIẾT/ GIẤY/
+CÓ-THỂ
+Tôi bị đau đầu. TÔI/ ĐẦU-ĐAU (Mặt nhăn)
+Bệnh này có lây không bác sĩ? HỎI/ BÁC-SĨ/ TÔI/ BỆNH/
+LÂY/ CÓ-KHÔNG
+Table 5: Sentence and gloss statistics of VSL-GH .
+Metric Vietnamese Gloss
+Total tokens 1,861 words 1,174 glosses
+Unique tokens 520 words 466 glosses
+Avg. per sentence 6.2 words 3.91 glosses
+Shortest 3 words 2 glosses
+Longest 13 words 8 glosses
+aclinical examination, and (5) Conclusion. On this basis, the
+sentence list was developed through four steps: (1) candidate
+sentences were automatically generated using large language
+models (LLMs); (2) manual review to remove duplicates and
+refine phrasing; (3) validation of the practical applicability of
+sentences by physicians at Tan Hung General Hospital; (4) fi-
+nalisation based on physician feedback.
+Sign glossing. After the sentence list was finalised and con-
+firmed by physicians, the next step was sign glossing — that
+is, converting each Vietnamese sentence into a corresponding
+gloss sequence following the grammatical structure of sign lan-
+guage. This step is crucial to ensure that signers produce nat-
+ural sign language structure rather than signing in the word
+order of Vietnamese. The glossing process was carried out by
+a sign language interpreter at the Centre for Research and Ed-
+ucation of the Deaf (CED), ensuring that the gloss sequences
+conform to the grammatical structure of the Ho Chi Minh City
+variant of VSL, including sign order, manual and non-manual
+features, and the expression of grammatical components such
+as exclamations, negations, and questions. The results were
+stored as a bilingual list (Vietnamese sentence — gloss se-
+quence) and used as a unified sign reference for signers dur-
+ing video recording. Representative examples are presented
+in Table 4. Detailed statistics of the sentence list and glosses
+are provided in Table 5.
+3.2Sign Language Video Recording
+Signers. The dataset was collected with the participation
+of 6 deaf signers (S01–S06), all of whom use the Ho Chi
+Minh City variant of VSL in daily communication, ensuring
+the authenticity of the data. The group is diverse in gender,
+age (born between 1992 and 2011), and handedness (5 right-
+Figure 2: Enter Caption
+handed, 1 left-handed — S03), reflecting natural variability in
+signing speed and movement amplitude among deaf individu-
+als.
+Recording pipeline. Prior to recording, all signers attended
+a sign unification session led by a CED sign language inter-
+preter, focusing on specialised medical terminology that lacks
+a unified sign in the community, ensuring consistency in vo-
+cabulary and sign structure across signers. Recording was con-
+ducted over 8 sessions, each lasting approximately 5 hours and
+covering approximately 35–40 sentences. To ensure complete
+independence between data splits, signers were assigned to
+fixed roles: S01–S04 performed each sentence 3 times (train-
+ing set); S05 performed each sentence once (validation set);
+S06 performed each sentence once (signer-independent test
+set). Each sentence was performed a total of 14 times, mul-
+tiplied by 2 camera angles yielding 28 videos per sentence,
+and300×28 = 8 ,400videos for the entire dataset, compris-
+ing 7,200 training videos, 600 validation videos, and 600 test
+videos.
+Green screen studio. All videos were recorded in a green
+screen studio under tightly controlled conditions of lighting,
+background, and camera angles. Two DJI Pocket 3 cameras
+were placed simultaneously at two angles: a frontal view at
+shoulder height capturing the full hand, face, and upper body
+region, and a lateral view at 90° providing depth information
+about hand and body movements that is typically lost in a flat
+2D view. The multiview setup was chosen based on findings
+from Multi-VSL, which showed that multiview recording re-
+duces hand occlusion and improves recognition accuracy by
+up to 19.75% compared to single-view setups. A green screen
+background was used to increase the contrast between the
+signer and the background, minimising noise during feature
+extraction. Lighting was arranged symmetrically on both sides
+of the signer to limit shadows and ensure uniform illumination
+of the hands, face, and upper body.
+Quality control and standardisation. Following data col-
+lection, all videos were inspected according to two categories
+of rejection criteria: technical failures (blur, shake, uneven
+lighting, cropped frames) and sign content errors (incorrect
+gloss execution, interrupted signing sequences). Videos that
+4
+
+=== Page 5 ===
+failed inspection were immediately re-recorded under CED
+interpreter supervision. Accepted videos were standardised
+to1080×1080 pixels at 30 fps in .mp4 format.
+3.3Annotation
+Annotation conventions. To ensure consistency throughout
+the annotation process, a unified gloss annotation convention
+was established prior to annotation. This convention was de-
+veloped with reference to widely used large-scale sign lan-
+guage datasets including RWTH-PHOENIX-Weather 2014T
+and How2Sign. Each gloss is written in uppercase Vietnamese
+corresponding most closely to the meaning of the sign. Com-
+pound signs are connected with hyphens (e.g., HUYẾT-ÁP ).
+The start time of a gloss is defined as the frame at which the
+hand begins purposeful movement towards the sign configura-
+tion. The end time is defined as the frame at which the sign
+movement is completed before transitioning to the next sign
+or returning to a rest position.
+Annotation setup. All data was annotated using ELAN, a
+tool widely used in sign language corpus construction. Each
+video was annotated on two parallel tiers: a Gloss tier record-
+ing each sign unit with detailed temporal boundaries, and a
+Text tier recording the corresponding Vietnamese sentence.
+Since frontal and lateral videos were recorded simultaneously
+and are perfectly synchronised in time, annotation was per-
+formed only on the 4,200 frontal-view videos; the resulting
+timestamps were then directly transferred to the correspond-
+ing 4,200 lateral-view videos.
+Annotation workflow and quality control. Annotation was
+carried out in two phases. In Phase1 , 300 frontal-view videos
+of signer S01 were collaboratively annotated with a CED sign
+language interpreter, producing 300 reference .eaf files con-
+firmed to meet the Ho Chi Minh City VSL standard, serving
+as templates for all subsequent annotation. In Phase 2 , the
+remaining 3,900 frontal-view videos were annotated based
+on the Phase 1 reference files; all 4,200 resulting files were
+then reviewed by the CED interpreter to ensure consistency.
+Only 10 gloss labels required correction, indicating that the
+template-based annotation process achieved high accuracy.
+The total annotation time for the 4,200 frontal-view videos
+was approximately 160 hours.
+Storage format. Annotation results are stored in .json for-
+mat along with 300 reference .eaf files to serve related sign
+language research. The combination of temporal gloss bound-
+aries and Vietnamese sentence translations provides a founda-
+tion for sign language recognition and translation research.
+3.4Body Keypoint Extraction
+Rather than using raw video directly, we extract body keypoint
+features for three main reasons: significantly reducing stor-
+age cost and accelerating training; removing irrelevant infor-
+mation such as clothing colour, lighting conditions, and back-
+ground, allowing the model to focus on signing motion; and
+improving signer-independent generalisation through higher
+invariance to appearance differences across signers.
+Keypoint extraction. Body keypoints were automatically ex-
+tracted from all 8,400 videos using MediaPipe Holistic. From
+the 543-landmark output, we retained 137 landmarks directly
+relevant to sign language: 25 body pose keypoints (upperbody), 70 facial landmarks, and 21 keypoints per hand. Each
+landmark is represented by (x, y, z )coordinates, yielding a
+feature vector of size 411 per frame and a tensor of size
+(T×411) per video, where Tis the number of frames. When
+a group of landmarks is not detected in a frame due to hand
+occlusion or the hand moving outside the field of view, the
+corresponding region is assigned a value of zero.
+Keypoint normalisation. To remove variation caused by dif-
+ferences in standing position and body size across signers, all
+coordinates are relatively normalised: centred on the shoulder
+midpoint and scaled by the shoulder width, ensuring that the
+features reflect signing motion rather than individual physical
+characteristics.
+3.5Dataset Statistics
+Table 6summarises the key statistics of VSL-GH . The dataset
+comprises 8,400 videos (4,200 frontal-view and 4,200 lateral-
+view) partitioned under a signer-independent protocol: S01–
+S04 are assigned to training (7,200 videos), S05 to validation
+(600 videos), and S06 to testing (600 videos). This split guar-
+antees zero signer overlap across partitions, enabling a rigor-
+ous evaluation of model generalisation to unseen signers.
+In terms of temporal characteristics, videos average 107.9
+frames in length, ranging from 55 to 151 frames, correspond-
+ing to an average duration of 3.6 seconds at 30 fps. In terms of
+linguistic characteristics, at the Vietnamese sentence level, the
+dataset contains 1,861 word tokens with 520 unique vocabu-
+lary items, averaging 6.2 words per sentence (shortest 3 words,
+longest 13 words). At the gloss level, the dataset has 1,174
+gloss tokens with 466 unique glosses, averaging 3.91 glosses
+per sentence (minimum 2 glosses, maximum 8 glosses).
+To our knowledge, VSL-GH is the first Vietnamese
+sign language dataset to simultaneously provide continuous
+sentence-level data, multiview recordings, temporally aligned
+gloss annotations, and body keypoint features in a healthcare
+communication domain, dedicated to the Ho Chi Minh City
+variant of VSL.
+3.6Privacy, Bias and Ethical Considerations
+Privacy. Since facial expressions are an essential component
+of sign language, recording the signer’s face is unavoidable.
+All signers provided written informed consent prior to record-
+ing, confirming permission to use their images for scientific
+research purposes and agreeing to the public release of their
+data. In the released dataset, signer identities are anonymised
+and referenced only by the codes S01–S06.
+Signer characteristics. All 6 signers are deaf individuals us-
+ing the Ho Chi Minh City variant of VSL in daily communi-
+cation, ensuring the linguistic authenticity of the data. The
+group comprises 5 males and 1 female, born between 1992
+and 2011, with diversity in handedness (5 right-handed, 1 left-
+handed). All signers were born and raised in Ho Chi Minh
+City, Vietnam.
+Geographic scope and language variety. VSL-GH was de-
+veloped specifically for the Ho Chi Minh City variant of VSL
+— one of the three major VSL variants comprising Hanoi, Hai
+Phong, and Ho Chi Minh City. Consequently, models trained
+on this dataset may not generalise directly to other VSL vari-
+ants without additional adaptation data.
+5
+
+=== Page 6 ===
+Table 6: Statistics of the VSL-GH dataset.
+train val test Total
+Sign language videos 7,200 600 600 8,400
+Frontal-view videos 3,600 300 300 4,200
+Lateral-view videos 3,600 300 300 4,200
+Avg. frames / video 107.9 (55–151)
+Camera views per video 2 (frontal + lateral)
+Sentences 300 300 300 300
+Unique glosses – 466
+Total gloss tokens – 1,174
+Annotation error rate – 0.12%
+Number of signers 4 1 1 6
+Signers not in train set – 1 1 –
+2D keypoints
+Body pose 25
+Facial landmarks 70 137
+Hand pose (two hands) 21 + 21
+Data bias. The dataset was collected under controlled stu-
+dio conditions with a green screen background and uniform
+lighting, and therefore does not reflect the diversity of light-
+ing conditions, backgrounds, or camera quality encountered
+in real-world environments. Furthermore, with 6 signers and
+a geographic scope limited to Ho Chi Minh City, the dataset
+does not fully capture the diversity of individual signing styles
+within the Vietnamese deaf community. These limitations
+should be considered when deploying models trained on this
+dataset in real-world settings.
+4.Experiments
+We conduct comprehensive experiments to evaluate the per-
+formance of existing SLT methods on VSL-GH, analyse the
+impact of multi-view input, assess signer generalisation, exam-
+ine performance trends under varying data scales, and charac-
+terise typical failure modes of the proposed model.
+4.1Experimental Setup
+Research Questions. We investigate the following research
+questions:
+RQ1 – Baseline Performance on VSL-GH. We assess how
+existing skeleton-based SLT methods perform on VSL-GH
+under the signer-independent protocol, establishing a compre-
+hensive benchmark for future comparisons on this dataset.
+RQ2 – Multi-view vs. Single-view. We evaluate the de-
+gree to which incorporating the side-view camera stream im-
+proves translation performance compared to using the front-
+view alone, examining whether the additional spatial infor-
+mation captured from a lateral perspective yields measurable
+gains.
+RQ3 – Signer Generalisation. We investigate how well the
+proposed model generalises to signers unseen during training,
+assessing whether the learned representations transfer across
+individual signing styles under the signer-independent proto-col.
+RQ4 – Effect of Data Scale. We evaluate how translation
+performance scales with the number of training sentences,
+providing insight into the dataset’s growth potential and guid-
+ing priorities for future annotation efforts.
+RQ5 – Performance by Sentence Type. We analyse which
+sentence categories pose the greatest difficulty for the model,
+and discuss the practical implications of these failure modes
+for real-world deployment in clinical healthcare settings.
+Data Split. We adopt a signer-independent evaluation pro-
+tocol, in which the test set consists of a signer who never
+appears during training. This protocol is considerably more
+challenging than signer-dependent evaluation, as it requires
+the model to learn signing representations that are invariant
+to individual style rather than memorising signer-specific pat-
+terns. Table 8summarises the data split. Note that signers
+S01–S04 each performed three repetitions per sentence while
+S05–S06 performed one repetition, resulting in a substantially
+larger training set.
+Baseline Methods. We compare against four representa-
+tive baselines covering the main paradigms of skeleton-based
+SLT: recurrent models ( GRU Seq2Seq ,BiLSTM Seq2Seq ),
+an attention-based model ( Vanilla Transformer ), and a
+graph-based model ( ST-GCN + Transformer ) [10]. The
+proposed model is a Skeleton Transformer trained with
+skeleton-relative normalisation, velocity-augmented features,
+and a joint CTC–cross-entropy objective weighted at 0.3 : 0.7.
+Due to the current scale of VSL-GH and the absence of pub-
+licly available implementations for several recent SLT meth-
+ods, we selected baselines that are reproducible and represen-
+tative of distinct architectural paradigms; comparisons with
+more recent approaches will be conducted as the dataset is
+expanded in Phase 2.
+Evaluation Metrics. We report five metrics: BLEU-4 [11]
+(↑),WER (↓),chrF (↑),ROUGE-L (↑), and BERTScore-
+F1[12] (↑). chrF and BERTScore are particularly well-suited
+for Vietnamese: chrF operates at the character level and han-
+dles diacritics and tonal markers more faithfully than token-
+level metrics, while BERTScore uses PhoBERT [13]—a lan-
+guage model pretrained specifically on Vietnamese—to com-
+pute semantic similarity with greater accuracy than multilin-
+gual alternatives.
+Implementation Details. All models are implemented in
+PyTorch and trained on 2 ×NVIDIA RTX A5000 GPUs
+(24 GB VRAM each), using the AdamW [14] optimiser with
+learning rate 10−4, batch size 16, a maximum of 200 epochs,
+and early stopping with patience 30. All results are reported
+asmean±stdover five random seeds.
+4.2Benchmark Performance on VSL-GH
+Table 7presents the performance of all methods on the test
+set (S06) under the signer-independent protocol with 300 sen-
+tences.
+6
+
+=== Page 7 ===
+Table 7: Benchmark results on VSL-GH (300 sentences, signer-independent, Test = S06). Best results in bold.
+Model BLEU-4 ( ↑) WER ( ↓) chrF ( ↑) ROUGE-L ( ↑) BERTScore ( ↑)
+GRU Seq2Seq 38.17±1.8 57.42±2.1 44.31 51.63 0.781
+BiLSTM Seq2Seq 42.53±1.5 52.18±1.9 48.72 55.41 0.803
+Vanilla Transformer 55.34±1.3 41.87±1.6 60.29 67.85 0.851
+ST-GCN + Transformer 59.21±1.2 38.64±1.4 64.53 71.22 0.863
+Proposed (Skeleton Transformer) 66 .82±0.9 31.58±1.1 71.84 77.63 0.887
+Table 8: Dataset split under the signer-independent protocol.
+Clip counts are reported per camera view.
+Split Signers Reps. Clips (per view)
+Train S01, S02, S03, S04 3 3,600
+Validation S05 1 300
+Test S06 1 300
+Analysis. Three consistent trends emerge. First, recurrent
+models (GRU, BiLSTM) achieve the lowest performance at
+38–43 BLEU-4, reflecting the limitations of sequential ar-
+chitectures in capturing long-range dependencies in contin-
+uous signing sequences. Second, the gap of +11 .48BLEU-
+4 between the Vanilla Transformer (55.34) and the pro-
+posed model (66.82) demonstrates the contribution of joint
+CTC and gloss supervision, which encourages the encoder
+to learn linguistically structured representations aligned with
+sign units. Third, ST-GCN + Transformer (59.21) outper-
+forms the Vanilla Transformer by modelling spatial relation-
+ships among body landmarks, yet falls short of the proposed
+model, which may be attributed to the absence of explicit
+motion-aware representations. The performance range of 38–
+67 BLEU-4 across methods indicates that VSL-GH presents a
+genuinely challenging yet tractable benchmark for Vietnamese
+SLT.
+4.3Ablation Study
+To validate the contribution of each component in the pro-
+posed model, we conduct an ablation study on the VSL-GH
+Phase 1 subset (150 annotated sentences, signer-independent,
+Test = S06). Table 9reports the results.
+Table 9: Ablation study on VSL-GH Phase 1 (150 sentences,
+signer-independent, Test = S06).
+Variant BLEU-4 ( ↑) WER ( ↓)
+Full model (proposed) 54.57 40.05
+w/o face keypoints 43.28 50.83
+w/o skeleton-relative norm. + velocity 44.29 47.30
+w/o CTC / gloss supervision 51.23 43.18
+Equal CTC–CE weight (0.5 : 0.5) 41.18 45.49
+Analysis. Four findings stand out. (i)Removing face key-
+points causes the largest single drop ( −11.29BLEU-4), un-
+derscoring the importance of non-manual features (NMF)—
+facial expressions, eye gaze, and head movement—whichcarry grammatical function in VSL, particularly for interrog-
+atives and negations. (ii)Removing skeleton-relative normali-
+sation and velocity features degrades performance by −10.28
+BLEU-4, confirming that explicit motion-aware representa-
+tion is essential for capturing the dynamic nature of sign se-
+quences. (iii)Removing CTC and gloss supervision leads
+to a−3.34BLEU-4 drop, demonstrating that gloss supervi-
+sion provides a meaningful training signal that stabilises en-
+coder learning and supports generalisation to unseen signers.
+(iv)Balancing the CTC–CE loss at equal weights (0.5 : 0.5)
+causes the second largest degradation ( −13.39BLEU-4), sug-
+gesting that over-weighting the CTC objective interferes with
+the translation decoder’s optimisation.
+4.4Impact of Multi-View Input
+To address RQ2, we compare the proposed model using only
+the front-view stream against the same model using both front
+and side views. Table 10reports the results.
+Table 10: Impact of side-view input on translation perfor-
+mance (proposed model, 300 sentences, Test = S06).
+Configuration BLEU-4 ( ↑) WER ( ↓)
+Front-view only 61.54 36.91
+Front + Side view 66.82 31.58
+Improvement +5 .28 −5.33
+Analysis. Adding the side-view stream yields +5.28BLEU-4
+and−5.33WER, confirming that the lateral camera captures
+depth and hand configurations not visible in the frontal view
+alone, and that the multi-view recording effort in VSL-GH
+yields tangible technical benefits.
+4.5Signer Generalisation and Data Scaling
+Signer Generalisation (RQ3). Leave-one-signer-out
+(LOSO) cross-validation across all six signers yields mean
+BLEU-4 of 65.04±2.18and WER of 33.30±2.22(range:
+61.87–68.29 BLEU-4). The result for S06 (66.82) lies within
+mean±std, confirming that S06 is not a “lucky split” and that
+the benchmark results are representative.
+Data Scaling Analysis (RQ4). We train the proposed model
+on progressively larger subsets of the training data to examine
+how performance scales with sentence count. Table 11reports
+the results.
+Analysis. Performance improves consistently across all data
+scales with no sign of plateau at 300 sentences, suggesting
+7
+
+=== Page 8 ===
+Table 11: Performance under varying training sentence set
+sizes (proposed model, signer-independent).
+Training sentences BLEU-4 ( ↑) WER ( ↓)
+75 34.21 61.43
+100 44.87 52.16
+150 54.57 40.05
+200 59.83 36.41
+300 66.82 31.58
+strong potential gains from future dataset expansion. These
+results provide direct motivation for Phase 2 of VSL-GH, in
+which the remaining sentences will be fully annotated. VSL-
+GH should therefore be regarded as a living benchmark with
+long-term research value rather than a fixed-scale resource.
+4.6Error Analysis
+Performance by Sentence Type (RQ5). Table 12breaks
+down the performance of the proposed model by sentence cat-
+egory.
+Table 12: Performance by sentence type (proposed model,
+300 sentences, Test = S06).
+Sentence Type Prop. BLEU-4 ( ↑) WER ( ↓)
+Declarative 49% 72.31 27.84
+Symptom description 9% 68.54 30.12
+Negative 14% 63.28 34.91
+Interrogative 24% 57.43 41.32
+Emergency / Urgent 4% 51.87 46.73
+Analysis. The model performs best on declarative sentences
+(72.31) and symptom descriptions (68.54), which are the most
+frequent categories and exhibit stable signing patterns. Inter-
+rogative sentences (57.43) and emergency utterances (51.87)
+present the greatest difficulty: interrogatives rely heavily on
+NMF such as brow raising and head tilting that skeleton key-
+points capture imprecisely, while the low performance on
+emergency sentences is compounded by the limited number
+of training examples in this category (12 sentences). These
+findings carry important practical implications : prior to de-
+ployment in clinical settings, particular attention must be paid
+to improving performance on interrogative and emergency ut-
+terances, which represent the highest-stakes communication
+scenarios in healthcare.
+Qualitative Analysis. Table 13illustrates representative
+translation outcomes from the test set, categorised by correct-
+ness.
+Analysis. Two error types are identified. The first islexi-
+cal confusion from similar signing trajectories : sentences
+such as“Bác sĩ có thể viết ra giấy được không?” and“Tại
+sao tôi phải chờ lâu vậy?” may be mistranslated because
+they share a large proportion of hand movement patterns with
+other training sentences, while the discriminative cues lie in
+fine-grained sign differences associated with question words—
+differences the model does not yet reliably capture. The sec-Table 13: Qualitative translation examples from the test
+set (S06). ✓= exact match; ≈= pragmatically equivalent;
+×= semantic error.
+Reference Hypothesis Eval.
+Quê quán tôi ở Sài
+Gòn.Quê quán tôi ở Sài
+Gòn.✓
+Bác sĩ hỏi gia đình
+tôi có ai bị bệnh này
+không hả?Bác sĩ hỏi gia đình
+tôi có ai bị bệnh này
+không hả?✓
+Khi nào thì tới lượt
+tôi?Sắp đến lượt tôi chưa
+ạ?≈
+Bác sĩ có thể viết ra
+giấy được không?Tôi có cần nộp giấy tờ
+gì không?×
+Tại sao tôi phải chờ lâu
+vậy?Tôi có phải chờ lâu
+không?×
+ondissurface-level divergence with semantic equivalence :
+the hypothesis “Sắp đến lượt tôi chưa ạ?” for the reference
+“Khi nào thì tới lượt tôi?” incurs a high WER penalty yet
+conveys identical communicative intent, suggesting that WER
+alone is insufficient for evaluating SLT quality in healthcare
+contexts. To address the first error type, future work should
+augment training data with additional examples targeting ques-
+tion words to improve the model’s sensitivity to fine-grained
+signing distinctions with high grammatical significance.
+5.Conclusion
+This paper introduces VSL-GH, the first sentence-level Viet-
+namese Sign Language dataset for general healthcare commu-
+nication based on the Ho Chi Minh City variant. The dataset
+comprises 8,400 multiview videos from 6 deaf signers, cov-
+ering 300 sentences with rich multi-level annotations includ-
+ing temporal gloss boundaries, corresponding Vietnamese sen-
+tences, and body keypoint features. We establish a signer-
+independent evaluation protocol and demonstrate that the pro-
+posed Skeleton Transformer achieves a BLEU-4 score of
+66.82%, outperforming all representative baselines. Experi-
+mental results further highlight the critical role of non-manual
+features, the benefit of the multiview recording setup, and the
+strong potential for performance gains as the dataset is scaled
+up. In future work, we plan to expand VSL-GH with more
+sentences and signers, incorporate additional regional variants
+of VSL, and work towards real-time sign language translation
+systems deployable in real-world healthcare settings.
+Acknowledgment
+The authors would like to thank the Centre for Research and
+Education of the Deaf (CED) for their expert support in sign
+language throughout the gloss preparation, data collection,
+and annotation quality control processes. We also thank the
+physicians at Tan Hung General Hospital for their assistance in
+validating the sentence list against the actual general health ex-
+amination procedure, ensuring the practical relevance of the
+dataset. Special thanks are extended to the six deaf partici-
+pants who generously contributed their time to provide signing
+data for this research.
+8
+

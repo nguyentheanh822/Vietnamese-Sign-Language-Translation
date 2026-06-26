@@ -1,0 +1,5 @@
+Gloss		00:00:00.010	00:00:00.840	TÔI
+Gloss		00:00:00.840	00:00:01.910	HUYẾT-ÁP
+Gloss		00:00:01.910	00:00:02.830	BÌNH-THƯỜNG
+Gloss		00:00:02.830	00:00:03.370	CÓ-KHÔNG
+Translation		00:00:00.000	00:00:03.370	Huyết áp của tôi có bình thường không?

@@ -1,0 +1,5 @@
+Gloss		00:00:00.010	00:00:00.370	TÔI
+Gloss		00:00:00.370	00:00:00.790	BỆNH
+Gloss		00:00:00.790	00:00:01.450	NGHIÊM-TRỌNG
+Gloss		00:00:01.450	00:00:02.190	CÓ-KHÔNG
+Translation		00:00:00.000	00:00:02.190	Bệnh của tôi có nghiêm trọng không?

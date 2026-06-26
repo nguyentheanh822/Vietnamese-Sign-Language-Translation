@@ -1,0 +1,4 @@
+Gloss		00:00:00.010	00:00:00.570	TÔI
+Gloss		00:00:00.570	00:00:01.130	THÔNG-TIN
+Gloss		00:00:01.130	00:00:01.890	SAI
+Translation		00:00:00.000	00:00:01.890	Thông tin của tôi bị sai.

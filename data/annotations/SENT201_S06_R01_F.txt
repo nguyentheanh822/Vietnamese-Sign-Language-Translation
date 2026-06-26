@@ -1,0 +1,6 @@
+Gloss		00:00:00.010	00:00:00.850	BÁC-SĨ
+Gloss		00:00:00.850	00:00:01.930	HỎI-TÔI
+Gloss		00:00:01.930	00:00:02.910	KINH-NGUYỆT
+Gloss		00:00:02.910	00:00:03.300	ĐỀU
+Gloss		00:00:03.300	00:00:03.970	CÓ-KHÔNG
+Translation		00:00:00.000	00:00:03.970	Bác sĩ hỏi kinh nguyệt của tôi có đều không hả?

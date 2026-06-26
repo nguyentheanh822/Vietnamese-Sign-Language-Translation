@@ -1,0 +1,4 @@
+Gloss		00:00:00.010	00:00:00.660	TÔI
+Gloss		00:00:00.660	00:00:01.120	MẮT-TRÁI
+Gloss		00:00:01.120	00:00:02.010	CHE
+Translation		00:00:00.000	00:00:02.010	Tôi che mắt trái lại phải không?

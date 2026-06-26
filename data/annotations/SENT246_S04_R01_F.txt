@@ -1,0 +1,5 @@
+Gloss		00:00:00.010	00:00:00.470	TÔI
+Gloss		00:00:00.470	00:00:01.290	XÉT-NGHIỆM
+Gloss		00:00:01.290	00:00:02.140	TỔNG-QUÁT
+Gloss		00:00:02.140	00:00:02.850	MUỐN
+Translation		00:00:00.000	00:00:02.850	Tôi muốn làm xét nghiệm tổng quát.

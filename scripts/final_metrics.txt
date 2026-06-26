@@ -1,0 +1,12 @@
+Model Directory                          | BLEU-4   | WER (%)  | chrF     | ROUGE-L 
+--------------------------------------------------------------------------------
+results/run                              |   0.00   | 465.64   |   5.77   |   8.92
+results/run_tb7_bilstm                   |   0.00   | 432.99   |   3.76   |   7.42
+results/run_tb7_gru                      |   0.00   | 388.01   |   6.37   |  12.94
+results/run_tb7_stgcn_transformer        |   2.69   |  85.15   |  14.65   |  36.83
+results/run_tb7_transformer_gloss_free   |  69.44   |  29.94   |  73.30   |  79.12
+results/run_tb8_ctc                      |  58.29   |  38.74   |  61.78   |  70.48
+results/run_tb8_ctc_supervised           |  63.76   |  35.31   |  67.70   |  74.57
+results/run_tb8_gloss_free               |  70.95   |  28.75   |  73.10   |  78.62
+results/run_tb8_supervised               |  69.56   |  30.14   |  73.15   |  78.92
+results/run_tb9_fs                       |  71.52   |  26.69   |  74.59   |  80.78

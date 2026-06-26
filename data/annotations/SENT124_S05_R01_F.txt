@@ -1,0 +1,5 @@
+Gloss		00:00:02.240	00:00:02.670	TÔI
+Gloss		00:00:02.670	00:00:02.830	THỪA-RUỘT
+Gloss		00:00:02.830	00:00:03.130	PHẪU-THUẬT
+Gloss		00:00:03.130	00:00:04.720	NĂM-NGOÁI
+Translation		00:00:02.240	00:00:04.720	Tôi đã phẫu thuật ruột thừa vào năm ngoái.

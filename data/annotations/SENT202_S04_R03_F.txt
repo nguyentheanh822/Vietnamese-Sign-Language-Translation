@@ -1,0 +1,5 @@
+Gloss		00:00:00.000	00:00:00.490	TÔI
+Gloss		00:00:00.490	00:00:01.250	KINH-NGUYỆT
+Gloss		00:00:01.250	00:00:01.700	ĐỀU
+Gloss		00:00:01.700	00:00:02.700	KHÔNG
+Translation		00:00:00.000	00:00:02.700	Kinh nguyệt của tôi không đều. 

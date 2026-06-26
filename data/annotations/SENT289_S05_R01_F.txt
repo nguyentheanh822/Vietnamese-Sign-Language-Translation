@@ -1,0 +1,4 @@
+Gloss		00:00:00.010	00:00:00.390	TÔI
+Gloss		00:00:00.390	00:00:01.030	PHẪU-THUẬT
+Gloss		00:00:01.030	00:00:01.810	CẦN-KHÔNG
+Translation		00:00:00.000	00:00:01.810	Tôi có cần phẫu thuật không?

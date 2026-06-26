@@ -1,0 +1,4 @@
+Gloss		00:00:00.010	00:00:01.430	KHÁM
+Gloss		00:00:01.430	00:00:02.110	CHI-PHÍ
+Gloss		00:00:02.110	00:00:02.880	BAO-NHIÊU
+Translation		00:00:00.000	00:00:02.880	Chi phí khám là bao nhiêu tiền ạ?

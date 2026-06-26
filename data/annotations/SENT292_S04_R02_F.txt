@@ -1,0 +1,6 @@
+Gloss		00:00:00.010	00:00:00.590	TÔI
+Gloss		00:00:00.590	00:00:01.500	THUỐC-UỐNG
+Gloss		00:00:01.500	00:00:02.230	NÀY
+Gloss		00:00:02.230	00:00:02.770	UỐNG
+Gloss		00:00:02.770	00:00:03.590	BAO-LÂU
+Translation		00:00:00.000	00:00:03.590	Tôi phải uống thuốc này trong bao lâu?

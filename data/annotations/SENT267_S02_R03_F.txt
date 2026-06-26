@@ -1,0 +1,4 @@
+Gloss		00:00:00.010	00:00:00.780	KẾT-QUẢ
+Gloss		00:00:00.780	00:00:01.130	HÔM-NAY
+Gloss		00:00:01.130	00:00:01.770	CÓ-KHÔNG
+Translation		00:00:00.000	00:00:01.770	Hôm nay có kết quả ngay không?

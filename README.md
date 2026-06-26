@@ -1,10 +1,18 @@
-# VSL-GH: Vietnamese Sign Language Dataset (Gloss & Hand)
+# VSL-GH: Vietnamese Sign Language Dataset
 
-## Overview
+VSL-GH is a large-scale, high-quality dataset for Vietnamese Sign Language (VSL) translation. It features multiple signers, dual-camera views (Frontal and Side), and detailed temporal boundary annotations.
 
-**VSL-GH** is a Vietnamese continuous sign language dataset collected for research on Sign Language Recognition (CSLR) and Sign Language Translation (SLT). It contains front-view videos of signers performing Vietnamese Sign Language (VSL) sentences, with time-aligned gloss annotations and Vietnamese text translations.
+## Dataset Highlights
+- **Size:** 4,200 video clips (Frontal) + 4,200 video clips (Side-view)
+- **Signers:** 6 independent signers
+- **Annotations:** Gloss-level and translation-level sequences with accurate temporal boundaries.
+- **Keypoints:** Extracted using MediaPipe Holistic (137 landmarks per frame).
 
-## Dataset Statistics
+## Project Structure
+- `data/`: Contains dataset JSON metadata, vocabularies, and splits.
+- `source/`: Contains the PyTorch source code for the models (ST-GCN, Transformer) and dataloaders.
+- `scripts/`: Shell scripts to reproduce baseline experiments (Table 7, 8, 9, 10).
+- `results/`: Contains training logs and checkpoints for the experiments.
 
 | Attribute | Value |
 |---|---|
@@ -102,26 +110,17 @@ print(sample["gloss_sequence"])   # ['TÔI', 'HẸN', 'TRƯỚC', 'CHƯA']
 print(sample["video_file"])       # 'videos/SENT001_S01_R01_F.mp4'
 ```
 
+## Quick Start
+1. Install dependencies: `pip install -r requirements.txt`
+2. Extract keypoints (if not already downloaded): 
+   `python source/extract_keypoints.py --num_workers 8`
+3. Train the baseline model:
+   `bash scripts/run_table7_baselines.sh`
+4. Evaluate a trained model:
+   `python source/evaluate.py --config source/config/config.yaml --checkpoint results/run_v2/checkpoint_best.pt`
+
 ## Citation
-
-If you use this dataset in your research, please cite:
-
-```bibtex
-@dataset{vsl_gh_2026,
-  title     = {VSL-GH: A Vietnamese Continuous Sign Language Dataset with Gloss Annotations},
-  author    = {[Author Names]},
-  year      = {2026},
-  publisher = {[University/Institution]},
-  note      = {[Thesis/Paper title]}
-}
-```
+If you use this dataset, please cite the corresponding paper.
 
 ## License
-
-This dataset is released under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
-
-You are free to share and adapt the material for any purpose, as long as appropriate credit is given.
-
-## Contact
-
-For questions about the dataset, please contact: [your email]
+This project and dataset are released under the MIT License. See `LICENSE` for more details.

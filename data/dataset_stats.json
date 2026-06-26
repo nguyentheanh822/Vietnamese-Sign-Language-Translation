@@ -1,0 +1,162 @@
+{
+  "dataset_name": "VSL-GH",
+  "description": "Vietnamese Sign Language - Gloss and Hand (Front View)",
+  "version": "1.0.0",
+  "total_videos": 2100,
+  "total_sentences": 150,
+  "total_signers": 6,
+  "train_signers": 4,
+  "val_signers": 1,
+  "test_signers": 1,
+  "split_counts": {
+    "train": 1800,
+    "val": 150,
+    "test": 150
+  },
+  "unique_glosses": 231,
+  "total_gloss_tokens": 8113,
+  "video_specs": {
+    "resolution": "1080x1080",
+    "fps": 30,
+    "aspect_ratio": "1:1",
+    "view": "Front",
+    "background": "Green screen"
+  },
+  "duration_stats_sec": {
+    "min": 0.89,
+    "max": 7.65,
+    "mean": 3.103
+  },
+  "gloss_per_sentence_stats": {
+    "min": 2,
+    "max": 8,
+    "mean": 3.86
+  },
+  "translation_word_stats": {
+    "min": 3,
+    "max": 10,
+    "mean": 5.77
+  },
+  "top_30_glosses": [
+    {
+      "gloss": "TÔI",
+      "count": 2044
+    },
+    {
+      "gloss": "KHÁM",
+      "count": 209
+    },
+    {
+      "gloss": "ĐẾN",
+      "count": 140
+    },
+    {
+      "gloss": "ĐO",
+      "count": 126
+    },
+    {
+      "gloss": "BỆNH",
+      "count": 126
+    },
+    {
+      "gloss": "CÓ-KHÔNG",
+      "count": 125
+    },
+    {
+      "gloss": "CÓ",
+      "count": 119
+    },
+    {
+      "gloss": "HUYẾT-ÁP",
+      "count": 98
+    },
+    {
+      "gloss": "RỒI",
+      "count": 97
+    },
+    {
+      "gloss": "GIẤY",
+      "count": 95
+    },
+    {
+      "gloss": "CẦN-KHÔNG",
+      "count": 94
+    },
+    {
+      "gloss": "MUỐN",
+      "count": 84
+    },
+    {
+      "gloss": "PHẢI-KHÔNG",
+      "count": 84
+    },
+    {
+      "gloss": "IX",
+      "count": 83
+    },
+    {
+      "gloss": "BÁC-SĨ",
+      "count": 83
+    },
+    {
+      "gloss": "CẦN",
+      "count": 83
+    },
+    {
+      "gloss": "CẢM-THẤY",
+      "count": 70
+    },
+    {
+      "gloss": "SỐ",
+      "count": 69
+    },
+    {
+      "gloss": "ĐÂY",
+      "count": 65
+    },
+    {
+      "gloss": "2",
+      "count": 56
+    },
+    {
+      "gloss": "NỘP",
+      "count": 56
+    },
+    {
+      "gloss": "CHƯA",
+      "count": 56
+    },
+    {
+      "gloss": "VIẾT",
+      "count": 56
+    },
+    {
+      "gloss": "MẠCH",
+      "count": 56
+    },
+    {
+      "gloss": "ĐƯỢC-KHÔNG",
+      "count": 54
+    },
+    {
+      "gloss": "1",
+      "count": 42
+    },
+    {
+      "gloss": "ĐẶT",
+      "count": 42
+    },
+    {
+      "gloss": "BẢO-HIỂM",
+      "count": 42
+    },
+    {
+      "gloss": "Y-TẾ",
+      "count": 42
+    },
+    {
+      "gloss": "LẠI",
+      "count": 42
+    }
+  ]
+}

@@ -20,6 +20,12 @@ from torch.utils.data import DataLoader
 from data.dataset import VSLDataset, collate_fn
 from models.slt_model import SLTModel
 from models.sota_model import SOTAModel
+from models.gru_model import GRUSLTModel
+from models.bilstm_model import BiLSTMSLTModel
+from models.conformer_model import ConformerSLTModel
+from models.st_transformer import STTransformerSLTModel
+from models.tcn_model import TCNSLTModel
+from models.mamba_model import MambaSLTModel
 from utils.vocab import Vocab, build_translation_vocab
 from utils.metrics import batch_wer, bleu4
 import yaml
@@ -77,6 +83,8 @@ def main():
         max_trans_len=cfg["data"]["max_trans_len"],
         augment=False,
         use_face=cfg["data"].get("use_face", True),
+        use_velocity=cfg["data"].get("use_velocity", True),
+        view_mode=cfg["data"].get("view_mode", "F"),
     )
     # Giam batch size khi beam search de tranh OOM
     eval_batch = cfg["training"]["batch_size"]
@@ -91,8 +99,9 @@ def main():
 
     # Model
     m_cfg = cfg["model"]
+    model_type = m_cfg.get("type", "transformer")
     use_sota = m_cfg.get("use_sota", False)
-    if use_sota:
+    if model_type == "stgcn" or use_sota:
         model = SOTAModel(
             input_dim=cfg["data"]["input_dim"],
             gloss_vocab_size=len(gloss_vocab),
@@ -107,6 +116,94 @@ def main():
             num_nodes=m_cfg.get("num_nodes", 137),
             coords=m_cfg.get("coords", 6),
         ).to(device)
+    elif model_type == "gru":
+        model = GRUSLTModel(
+            input_dim=cfg["data"]["input_dim"],
+            gloss_vocab_size=len(gloss_vocab),
+            trans_vocab_size=len(trans_vocab),
+            hidden_dim=m_cfg.get("d_model", 512),
+            emb_dim=m_cfg.get("d_model", 512) // 2,
+            num_layers=m_cfg.get("num_encoder_layers", 2),
+            dropout=m_cfg.get("dropout", 0.1),
+            pad_idx=trans_vocab.pad_idx,
+        ).to(device)
+    elif model_type == "bilstm":
+        model = BiLSTMSLTModel(
+            input_dim=cfg["data"]["input_dim"],
+            gloss_vocab_size=len(gloss_vocab),
+            trans_vocab_size=len(trans_vocab),
+            hidden_dim=m_cfg.get("d_model", 512),
+            emb_dim=m_cfg.get("d_model", 512) // 2,
+            num_layers=m_cfg.get("num_encoder_layers", 2),
+            dropout=m_cfg.get("dropout", 0.1),
+            pad_idx=trans_vocab.pad_idx,
+        ).to(device)
+    elif model_type == 'stgcn':
+        model = SOTAModel(
+            vocab_size=len(trans_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"]
+        ).to(device)
+        print("=> Initialized SOTAModel (ST-GCN + Transformer)")
+    elif model_type == 'conformer':
+        model = ConformerSLTModel(
+            vocab_size=len(trans_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"],
+            input_dim=cfg["data"]["input_dim"],
+            max_seq_len=cfg["data"]["max_seq_len"]
+        ).to(device)
+        print("=> Initialized ConformerSLTModel")
+    elif model_type == 'st_transformer':
+        model = STTransformerSLTModel(
+            vocab_size=len(trans_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"],
+            num_nodes=137,
+            coords=6,
+            max_seq_len=cfg["data"]["max_seq_len"]
+        ).to(device)
+        print("=> Initialized STTransformerSLTModel")
+    elif model_type == 'tcn':
+        model = TCNSLTModel(
+            vocab_size=len(trans_vocab),
+            gloss_vocab_size=len(gloss_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"],
+            input_dim=cfg["data"]["input_dim"],
+            max_seq_len=cfg["data"]["max_seq_len"]
+        ).to(device)
+        print("=> Initialized TCNSLTModel")
+    elif model_type == 'mamba':
+        model = MambaSLTModel(
+            vocab_size=len(trans_vocab),
+            gloss_vocab_size=len(gloss_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"],
+            input_dim=cfg["data"]["input_dim"],
+            max_seq_len=cfg["data"]["max_seq_len"]
+        ).to(device)
+        print("=> Initialized MambaSLTModel")
     else:
         model = SLTModel(
             input_dim=cfg["data"]["input_dim"],
@@ -125,7 +222,16 @@ def main():
     ckpt_path = args.checkpoint or f"{base_dir}/results/run/checkpoint_best.pt"
     if Path(ckpt_path).exists():
         ckpt = torch.load(ckpt_path, map_location=device)
-        model_state = ckpt.get("model_state", ckpt)
+        model_state = ckpt["model_state"] if "model_state" in ckpt else ckpt["model"]
+    
+        # Filter out gloss_proj if shape mismatch
+        current_state = model.state_dict()
+        for k in list(model_state.keys()):
+            k_no_module = k.replace("module.", "")
+            if k_no_module in current_state and model_state[k].shape != current_state[k_no_module].shape:
+                print(f"Skipping parameter {k} due to shape mismatch: ckpt {model_state[k].shape} vs model {current_state[k_no_module].shape}")
+                del model_state[k]
+
         missing, unexpected = model.load_state_dict(model_state, strict=False)
         epoch    = ckpt.get("epoch", "?")
         best_b   = ckpt.get("best_bleu", "?")

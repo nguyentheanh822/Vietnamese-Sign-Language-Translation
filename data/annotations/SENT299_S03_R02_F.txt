@@ -1,0 +1,6 @@
+Gloss		00:00:00.010	00:00:00.700	HỎI
+Gloss		00:00:00.700	00:00:01.480	RƯỢU-BIA
+Gloss		00:00:01.480	00:00:02.030	THỨC-KHUYA
+Gloss		00:00:02.030	00:00:03.180	ÍT
+Gloss		00:00:03.180	00:00:03.650	PHẢI-KHÔNG
+Translation		00:00:00.000	00:00:03.650	Tôi sẽ hạn chế rượu bia và thức khuya?

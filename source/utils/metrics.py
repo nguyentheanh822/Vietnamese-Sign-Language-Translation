@@ -90,7 +90,7 @@ def chrf_score(hypotheses: list, references: list) -> float:
     import sacrebleu
     # sacrebleu expects list of strings
     hyp_strs = [" ".join(h) for h in hypotheses]
-    ref_strs = [[" ".join(r)] for r in references] # requires list of references per sentence
+    ref_strs = [[" ".join(r) for r in references]] # list of reference streams
     if not hyp_strs: return 0.0
     chrf = sacrebleu.corpus_chrf(hyp_strs, ref_strs)
     return chrf.score

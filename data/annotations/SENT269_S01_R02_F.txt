@@ -1,0 +1,6 @@
+Gloss		00:00:00.010	00:00:00.610	TÔI
+Gloss		00:00:00.610	00:00:01.930	PHÒNG
+Gloss		00:00:01.930	00:00:02.500	BÁC-SĨ
+Gloss		00:00:02.500	00:00:03.100	QUAY-LẠI
+Gloss		00:00:03.100	00:00:03.980	PHẢI-KHÔNG
+Translation		00:00:00.000	00:00:03.980	Bây giờ tôi quay lại phòng bác sĩ phải không?

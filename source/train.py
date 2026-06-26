@@ -22,6 +22,14 @@ from torch.nn.parallel import DataParallel
 from data.dataset import VSLDataset, collate_fn
 from models.slt_model import SLTModel
 from models.sota_model import SOTAModel
+from models.gru_model import GRUSLTModel
+from models.bilstm_model import BiLSTMSLTModel
+from models.conformer_model import ConformerSLTModel
+from models.st_transformer import STTransformerSLTModel
+from models.tcn_model import TCNSLTModel
+from models.mamba_model import MambaSLTModel
+import numpy as np
+import random
 from utils.vocab import Vocab, build_translation_vocab
 from utils.metrics import batch_wer, bleu4, ids_to_tokens
 
@@ -86,11 +94,24 @@ def compute_loss(model, batch, gloss_vocab, trans_vocab, cfg, device):
         gloss_lens_clamp,
     )
 
-    w_ctc = cfg["training"]["ctc_weight"]
-    w_ce  = cfg["training"]["ce_weight"]
-    total = w_ctc * ctc_loss + w_ce * ce_loss
+    # ── Frame-level CE Loss (Supervised Gloss) ───────────────────────────
+    frame_ce_loss = 0.0
+    w_frame = cfg["training"].get("frame_ce_weight", 0.0)
+    if w_frame > 0.0:
+        log_probs = ctc_log_probs.permute(1, 2, 0) # (B, V, T)
+        frame_gloss_ids = batch["frame_gloss_ids"].to(device) # (B, T)
+        frame_gloss_ids_masked = frame_gloss_ids.clone()
+        frame_gloss_ids_masked[batch["kp_mask"]] = -100 # Ignore padding
+        frame_ce_loss = nn.NLLLoss(ignore_index=-100)(log_probs, frame_gloss_ids_masked)
 
-    return total, ce_loss.item(), ctc_loss.item()
+    w_ctc = cfg["training"].get("ctc_weight", 0.0)
+    w_ce  = cfg["training"].get("ce_weight", 1.0)
+    
+    total = w_ctc * ctc_loss + w_ce * ce_loss
+    if w_frame > 0.0:
+        total += w_frame * frame_ce_loss
+
+    return total, ce_loss.item(), ctc_loss.item() if w_ctc > 0.0 else (frame_ce_loss.item() if w_frame > 0.0 else 0.0)
 
 
 def evaluate(model, loader, gloss_vocab, trans_vocab, cfg, device):
@@ -145,6 +166,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="source/config/config.yaml")
     parser.add_argument("--resume", default=None, help="Path to checkpoint to resume")
+    parser.add_argument("--gpu", default="0", help="GPU id to use")
     args = parser.parse_args()
 
     cfg = load_config(args.config)
@@ -152,7 +174,15 @@ def main():
     # ── GPU setup ───────────────────────────────────────────────────────────
     # NOTE: CUDA_VISIBLE_DEVICES phai duoc set tu shell command truoc khi chay script
     # Vi du: CUDA_VISIBLE_DEVICES=0,1 python3 source/train.py
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
+
+    # Set random seeds for reproducibility
+    seed = cfg["training"].get("seed", 42)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
     n_gpu = torch.cuda.device_count()
     print(f"Using device: {device} | Visible GPUs: {n_gpu}")
     for i in range(n_gpu):
@@ -182,6 +212,8 @@ def main():
         aug_noise_std=aug.get("noise_std", 0.01),
         aug_rotation_deg=aug.get("rotation_deg", 15.0),
         use_face=cfg["data"].get("use_face", True),
+        use_velocity=cfg["data"].get("use_velocity", True),
+        view_mode=cfg["data"].get("view_mode", "F"),
     )
     val_ds = VSLDataset(
         base_dir, split="val",
@@ -191,6 +223,8 @@ def main():
         max_trans_len=cfg["data"]["max_trans_len"],
         augment=False,
         use_face=cfg["data"].get("use_face", True),
+        use_velocity=cfg["data"].get("use_velocity", True),
+        view_mode=cfg["data"].get("view_mode", "F"),
     )
 
     train_loader = DataLoader(
@@ -209,9 +243,9 @@ def main():
 
     # ── Model ───────────────────────────────────────────────────────────────
     m_cfg = cfg["model"]
+    model_type = m_cfg.get("type", "transformer")
     
-    use_sota = m_cfg.get("use_sota", False)
-    if use_sota:
+    if model_type == "stgcn":
         model = SOTAModel(
             input_dim=cfg["data"]["input_dim"],
             gloss_vocab_size=len(gloss_vocab),
@@ -227,6 +261,85 @@ def main():
             coords=m_cfg.get("coords", 6),
         ).to(device)
         print("=> Initialized SOTAModel (ST-GCN + Transformer)")
+    elif model_type == "gru":
+        model = GRUSLTModel(
+            input_dim=cfg["data"]["input_dim"],
+            gloss_vocab_size=len(gloss_vocab),
+            trans_vocab_size=len(trans_vocab),
+            hidden_dim=m_cfg.get("d_model", 512),
+            emb_dim=m_cfg.get("d_model", 512) // 2,
+            num_layers=m_cfg.get("num_encoder_layers", 2),
+            dropout=m_cfg.get("dropout", 0.1),
+            pad_idx=trans_vocab.pad_idx,
+        ).to(device)
+        print("=> Initialized GRUSLTModel")
+    elif model_type == "bilstm":
+        model = BiLSTMSLTModel(
+            input_dim=cfg["data"]["input_dim"],
+            gloss_vocab_size=len(gloss_vocab),
+            trans_vocab_size=len(trans_vocab),
+            hidden_dim=m_cfg.get("d_model", 512),
+            emb_dim=m_cfg.get("d_model", 512) // 2,
+            num_layers=m_cfg.get("num_encoder_layers", 2),
+            dropout=m_cfg.get("dropout", 0.1),
+            pad_idx=trans_vocab.pad_idx,
+        ).to(device)
+        print("=> Initialized BiLSTMSLTModel")
+    elif model_type == 'conformer':
+        model = ConformerSLTModel(
+            vocab_size=len(trans_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"],
+            input_dim=cfg["data"]["input_dim"],
+            max_seq_len=cfg["data"]["max_seq_len"]
+        ).to(device)
+        print("=> Initialized ConformerSLTModel")
+    elif model_type == 'st_transformer':
+        model = STTransformerSLTModel(
+            vocab_size=len(trans_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"],
+            num_nodes=137,
+            coords=6,
+            max_seq_len=cfg["data"]["max_seq_len"]
+        ).to(device)
+        print("=> Initialized STTransformerSLTModel")
+    elif model_type == 'tcn':
+        model = TCNSLTModel(
+            vocab_size=len(trans_vocab),
+            gloss_vocab_size=len(gloss_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"],
+            input_dim=cfg["data"]["input_dim"],
+            max_seq_len=cfg["data"]["max_seq_len"]
+        ).to(device)
+        print("=> Initialized TCNSLTModel")
+    elif model_type == 'mamba':
+        model = MambaSLTModel(
+            vocab_size=len(trans_vocab),
+            gloss_vocab_size=len(gloss_vocab),
+            d_model=cfg["model"]["d_model"],
+            nhead=cfg["model"]["nhead"],
+            num_encoder_layers=cfg["model"]["num_encoder_layers"],
+            num_decoder_layers=cfg["model"]["num_decoder_layers"],
+            dim_feedforward=cfg["model"]["dim_feedforward"],
+            dropout=cfg["model"]["dropout"],
+            input_dim=cfg["data"]["input_dim"],
+            max_seq_len=cfg["data"]["max_seq_len"]
+        ).to(device)
+        print("=> Initialized MambaSLTModel")
     else:
         model = SLTModel(
             input_dim=cfg["data"]["input_dim"],

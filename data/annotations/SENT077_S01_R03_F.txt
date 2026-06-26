@@ -1,0 +1,4 @@
+Gloss		00:00:00.010	00:00:00.800	TÔI
+Gloss		00:00:00.800	00:00:01.610	BMI
+Gloss		00:00:01.610	00:00:02.744	BAO-NHIÊU
+Translation		00:00:00.000	00:00:02.744	Chỉ số BMI của tôi là bao nhiêu?

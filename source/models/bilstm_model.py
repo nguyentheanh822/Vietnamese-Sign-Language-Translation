@@ -60,7 +60,7 @@ class Attention(nn.Module):
         attention = self.v(energy).squeeze(2)
         
         if mask is not None:
-            attention = attention.masked_fill(mask == True, -1e10)
+            attention = attention.masked_fill(mask == True, -1e4)
             
         return F.softmax(attention, dim=1)
 

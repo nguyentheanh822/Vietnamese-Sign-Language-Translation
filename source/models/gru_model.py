@@ -45,7 +45,7 @@ class Attention(nn.Module):
         attention = self.v(energy).squeeze(2) # (B, T)
         
         if mask is not None:
-            attention = attention.masked_fill(mask == True, -1e10)
+            attention = attention.masked_fill(mask == True, -1e4)
             
         return F.softmax(attention, dim=1)
 
@@ -138,3 +138,30 @@ class GRUSLTModel(nn.Module):
             input = tgt[:, t] if teacher_force else top1
             
         return trans_logits, ctc_log_probs
+
+    @torch.no_grad()
+    def greedy_decode(self, src, src_mask, bos_idx, eos_idx, max_len=50):
+        batch_size = src.shape[0]
+        device = src.device
+        
+        encoder_outputs, hidden = self.encoder(src, src_mask)
+        
+        ys = torch.full((batch_size, 1), bos_idx, dtype=torch.long, device=device)
+        finished = torch.zeros(batch_size, dtype=torch.bool, device=device)
+        
+        input = ys[:, 0]
+        
+        for _ in range(max_len):
+            output, hidden = self.decoder(input, hidden, encoder_outputs, src_mask)
+            next_token = output.argmax(1)
+            
+            next_token = torch.where(finished, torch.full_like(next_token, eos_idx), next_token)
+            
+            ys = torch.cat([ys, next_token.unsqueeze(1)], dim=1)
+            finished = finished | (next_token == eos_idx)
+            if finished.all():
+                break
+                
+            input = next_token
+            
+        return ys[:, 1:]

@@ -1,0 +1,5 @@
+Gloss		00:00:00.010	00:00:00.690	TÔI
+Gloss		00:00:00.690	00:00:01.360	XÉT-NGHIỆM
+Gloss		00:00:01.360	00:00:02.540	NƯỚC-TIỂU
+Gloss		00:00:02.540	00:00:03.470	CẦN-KHÔNG
+Translation		00:00:00.000	00:00:03.470	Tôi cần đi xét nghiệm nước tiểu.
