@@ -10,7 +10,7 @@ VSL-GH is a large-scale, high-quality dataset for Vietnamese Sign Language (VSL)
 
 ## Project Structure
 - `data/`: Contains dataset JSON metadata, vocabularies, and splits.
-- `source/`: Contains the PyTorch source code for the models (ST-GCN, Transformer) and dataloaders.
+- `source/`: Contains the PyTorch source code for the models (BiLSTM, GRU, TCN, Transformer, Conformer, Mamba) and dataloaders.
 - `scripts/`: Shell scripts to reproduce baseline experiments (Table 7, 8, 9, 10).
 - `results/`: Contains training logs and checkpoints for the experiments.
 
